@@ -10,6 +10,6 @@ process FASTQC {
 
     script:
     """
-    fastqc $reads
+    ${params.fastqc} $reads
     """
 }

@@ -11,8 +11,8 @@ process ALIGN {
 
     script:
     """
-    bwa index $ref
-    bwa mem $ref $reads | samtools sort -o aligned.bam
-    samtools index aligned.bam
+    ${params.bwa} index $ref
+    ${params.bwa} mem $ref $reads | ${params.samtools} sort -o aligned.bam
+    ${params.samtools} index aligned.bam
     """
 }

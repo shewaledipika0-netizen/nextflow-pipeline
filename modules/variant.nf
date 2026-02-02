@@ -11,6 +11,7 @@ process VARIANT {
 
     script:
     """
-    bcftools mpileup -f $ref $bam | bcftools call -mv -Ov -o variants.vcf
+    ${params.bcftools} mpileup -f $ref $bam | \
+    ${params.bcftools} call -mv -Ov -o variants.vcf
     """
 }
