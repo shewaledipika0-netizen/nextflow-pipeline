@@ -25,7 +25,7 @@ All computational steps are implemented as independent modules, while the overal
 
 The pipeline architecture consists of three logical layers:
 
-###3.1 Entry Layer (main.nf)
+### 3.1 Entry Layer (main.nf)
 
 The entry file serves only as the execution entry point. It does not contain any process definitions or module imports. Instead, it simply triggers the workflow defined in the workflows directory. This keeps the entry file minimal and ensures a clean separation between execution and logic.
 
