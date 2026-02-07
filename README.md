@@ -69,8 +69,25 @@ Modules reference these predefined configuration parameters rather than hard-cod
 ## 6. Environment Reproducibility
 
 To ensure consistent execution across systems, the pipeline includes an exported Conda environment specification file. This file captures exact software dependencies and versions required by the workflow. By recreating the same environment, users can reproduce identical results on different machines or at different times.
+## 7. Repository Structure
 
-## 7. Reproducibility and Validation
+```bash
+.
+├── main.nf
+├── nextflow.config
+├── workflows/
+│   └── variant_calling.nf
+├── modules/
+│   ├── qc.nf
+│   ├── align.nf
+│   └── variant_call.nf
+├── data/
+│   ├── reads/
+│   └── reference/
+├── results/
+└── README.md
+
+## 8. Reproducibility and Validation
 
 The pipeline was validated by cloning the repository into a fresh directory and executing the workflow without modifying any internal files. Successful execution of all stages confirms that:
 
@@ -82,7 +99,7 @@ The workflow is portable and reproducible
 
 This validation step demonstrates compliance with reproducible research principles commonly required in bioinformatics studies.
 
-## 8. Advantages of the Implemented Pipeline
+## 9. Advantages of the Implemented Pipeline
 
 Modular design enables reuse and extension
 
@@ -94,6 +111,6 @@ Environment management ensures reproducibility
 
 Clean repository structure follows best practices
 
-## 9. Conclusion
+## 10. Conclusion
 
 This project demonstrates the implementation of a structured and reproducible NGS variant calling pipeline using Nextflow. By adhering to modular workflow principles, separating configuration from logic, and validating reproducibility through repository cloning, the pipeline meets key standards expected in academic and professional bioinformatics workflows. The design allows easy extension to additional downstream analyses such as variant filtering, annotation, or visualization.
