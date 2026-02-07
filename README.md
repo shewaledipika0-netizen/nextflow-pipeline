@@ -1,116 +1,90 @@
-# Nextflow Variant Calling Pipeline
+# Nextflow Variant Calling Pipeline 
 
+## 1. Overview
+This repository contains a modular Nextflow DSL2 workflow for basic NGS variant calling. The pipeline follows best practices by keeping all modules inside the workflow file, placing the workflow in the workflows/ directory, keeping configuration in nextflow.config, and providing a Conda environment for reproducibility.
 
-## 1. Introduction
+## 2. What the Pipeline Does
+The pipeline executes the following stages in order:
+•	Input FASTQ reads + reference genome
+•	Quality Control (FastQC)
+•	Read alignment to reference (BWA)
+•	Alignment processing (Samtools)
+•	Variant calling (BCFtools) → VCF output
 
-Next-generation sequencing (NGS) technologies generate large volumes of genomic data that require automated, reproducible, and scalable computational workflows for accurate analysis. Variant calling is a core task in NGS analysis, involving the identification of single nucleotide polymorphisms (SNPs) and small insertions or deletions (INDELs) by comparing sequencing reads against a reference genome.
-
-This project implements a modular and reproducible NGS variant calling pipeline using Nextflow. The pipeline follows best practices in workflow design by separating processes into independent modules, orchestrating them through a workflow definition, and externalizing tool configuration. The focus of this pipeline is on clarity, reproducibility, and adherence to standardized workflow development guidelines.
-
-## 2. Workflow Design Philosophy
-
-The pipeline is designed according to the Nextflow DSL2 modular workflow architecture, which emphasizes:
-
-Separation of concerns between workflow logic and process definitions
-
-Reusability of individual analysis steps
-
-Clear data flow between analysis stages
-
-Reproducibility across computing environments
-
-All computational steps are implemented as independent modules, while the overall execution logic is defined in a centralized workflow file. This design ensures that the pipeline remains easy to extend, debug, and maintain.
-
-## 3. Pipeline Architecture
-
-The pipeline architecture consists of three logical layers:
-
-### 3.1 Entry Layer (main.nf)
-
-The entry file serves only as the execution entry point. It does not contain any process definitions or module imports. Instead, it simply triggers the workflow defined in the workflows directory. This keeps the entry file minimal and ensures a clean separation between execution and logic.
-
-### 3.2 Workflow Layer (workflows/)
-
-The workflow layer defines the order of execution and data dependencies between modules. All modules are imported and connected at this level. The workflow coordinates the flow of sequencing data from raw input generation through quality control, alignment, and variant calling.
-
-### 3.3 Module Layer (modules/)
-
-Each analytical step is implemented as a standalone module. Modules are responsible for a single task only and do not contain workflow logic. This modular structure allows individual components to be reused in other workflows or extended independently.
-
-## 4. Description of Pipeline Stages
-### 4.1 Data Preparation
-
-The pipeline begins with a data preparation stage that provides sequencing reads and a reference genome in standardized formats. This stage ensures that all downstream analyses receive consistent and valid input data.
-
-### 4.2 Quality Control
-
-Quality control is performed to assess the integrity and overall quality of sequencing reads. This step helps identify potential issues such as low base quality, sequence duplication, or GC bias before alignment. Quality metrics are generated for inspection but do not alter the input data.
-
-### 4.3 Read Alignment
-
-High-quality sequencing reads are aligned to a reference genome using a read alignment strategy. This step produces sorted and indexed alignment files, which serve as the foundation for downstream variant detection. Accurate alignment is essential for reliable variant calling.
-
-### 4.4 Variant Calling
-
-Aligned reads are analyzed to identify genomic variants relative to the reference genome. This stage produces a Variant Call Format (VCF) file containing detected variants along with associated metadata. The output represents the final analytical result of the pipeline.
-
-## 5. Configuration Management
-
-All external tool paths are defined in the Nextflow configuration file using absolute paths. This ensures:
-
-Predictable execution regardless of environment
-
-Clear separation between workflow logic and system-specific settings
-
-Easy adaptation to different computing systems
-
-Modules reference these predefined configuration parameters rather than hard-coding tool locations, improving portability and maintainability.
-
-## 6. Environment Reproducibility
-
-To ensure consistent execution across systems, the pipeline includes an exported Conda environment specification file. This file captures exact software dependencies and versions required by the workflow. By recreating the same environment, users can reproduce identical results on different machines or at different times.
-## 7. Repository Structure
-
-```bash
-.
+## 3. Repository Structure
+The repository is organized in a clean DSL2 format. The main.nf file is kept minimal, and the workflow orchestration is stored in workflows/.
+nextflow-pipeline/
 ├── main.nf
 ├── nextflow.config
+├── README.md
 ├── workflows/
-│   └── variant_calling.nf
+│   └── workflow.nf
 ├── modules/
-│   ├── qc.nf
+│   ├── download.nf
+│   ├── fastqc.nf
 │   ├── align.nf
-│   └── variant_call.nf
+│   └── variant.nf
 ├── data/
-│   ├── reads/
-│   └── reference/
-├── results/
-└── README.md
+├── reference/
+└── results/
 
-## 8. Reproducibility and Validation
+## 4. Requirements / Best Practices Implemented
+This pipeline was updated to satisfy the following requirements:
+•	Modules are NOT imported in main.nf (imports are done only inside the workflow).
+•	Workflow is placed inside workflows/ folder.
+•	No usage of nextflow.enable.dsl = 2 (Nextflow 25+ runs DSL2 by default).
+•	Tool binaries are defined in nextflow.config using absolute paths.
+•	Modules reference tool paths from nextflow.config (no hard-coded commands).
+•	Conda environment .yml file is included in the repository.
+•	README includes all required commands: clone, setup, run, outputs.
 
-The pipeline was validated by cloning the repository into a fresh directory and executing the workflow without modifying any internal files. Successful execution of all stages confirms that:
+## 5. Installation and Setup (Commands)
+Follow these commands step-by-step to use this repository on a new system.
+### 5.1 Clone the repository:
+git clone https://github.com/shewaledipika0-netizen/nextflow-pipeline.git
+cd nextflow-pipeline
+### 5.2 Create the Conda environment using the exported YAML file:
+conda env create -f environment.yml
+conda activate nextflow_variant_env
+Note: If you are using mamba, you can replace 'conda' with 'mamba' for faster installation.
+### 5.3 Verify tools are installed correctly:
+which nextflow
+which fastqc
+which bwa
+which samtools
+which bcftools
 
-The repository is self-contained
+## 6. Running the Pipeline (Commands)
+Run the workflow using the main entry script. This will automatically call the workflow stored inside workflows/.
+nextflow run main.nf
+Optional: Run again using resume (saves time if already executed):
+nextflow run main.nf -resume
 
-No hidden dependencies exist
+## 7. Output Files
+All pipeline outputs are stored inside the results/ folder. The pipeline produces:
+•	FastQC HTML reports (quality control)
+•	Aligned BAM file
+•	VCF file containing variants
 
-The workflow is portable and reproducible
+## 8. Git Commands Used During Development
+The following commands were used to update and push the repository changes to GitHub:
+git status
+git add .
+git commit -m "Update workflow structure, config, and README"
+git push origin main
 
-This validation step demonstrates compliance with reproducible research principles commonly required in bioinformatics studies.
-
-## 9. Advantages of the Implemented Pipeline
-
-Modular design enables reuse and extension
-
-Clear workflow orchestration improves readability
-
-Externalized configuration enhances portability
-
-Environment management ensures reproducibility
-
-Clean repository structure follows best practices
+## 9. Common Issues and Fixes
+Issue: bcftools: command not found
+Cause: BCFtools is not installed in the active environment OR its path is not correctly set in nextflow.config.
+Fix (recommended): install via Conda and confirm using 'which bcftools'.
+Issue: Git warning about embedded repository (submodule warning)
+Cause: A folder inside your project was accidentally initialized as a separate git repository.
+Fix: remove it using:
+git rm --cached <folder_name>
+rm -rf <folder_name>
+git add .
+git commit -m "Remove nested git repository"
+git push origin main
 
 ## 10. Conclusion
-
-This project demonstrates the implementation of a structured and reproducible NGS variant calling pipeline using Nextflow. By adhering to modular workflow principles, separating configuration from logic, and validating reproducibility through repository cloning, the pipeline meets key standards expected in academic and professional bioinformatics workflows. The design allows easy extension to additional downstream analyses such as variant filtering, annotation, or visualization.
+This project demonstrates a clean modular Nextflow DSL2 implementation of a basic variant calling pipeline. It follows recommended workflow structure, uses configuration-driven tool paths, and provides a reproducible Conda environment. The repository can be cloned and executed successfully on a fresh system using the documented commands.
